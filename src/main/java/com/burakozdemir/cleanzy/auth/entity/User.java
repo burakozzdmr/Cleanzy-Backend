@@ -1,4 +1,4 @@
-package com.burakozdemir.cleanzy.auth.model;
+package com.burakozdemir.cleanzy.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

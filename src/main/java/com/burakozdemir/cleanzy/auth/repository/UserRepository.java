@@ -1,6 +1,6 @@
 package com.burakozdemir.cleanzy.auth.repository;
 
-import com.burakozdemir.cleanzy.auth.model.User;
+import com.burakozdemir.cleanzy.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
