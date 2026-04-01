@@ -1,6 +1,7 @@
 package com.burakozdemir.cleanzy.auth.entity;
 
 public enum Role {
-    USER,
+    CUSTOMER,
+    CLEANER,
     ADMIN
 }
