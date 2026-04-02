@@ -6,10 +6,22 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorType {
 
-    VALIDATION_ERROR(
-            HttpStatus.BAD_REQUEST,
-            "VALIDATION_ERROR",
-            "Validation error"
+    AUTHENTICATION_ERROR(
+            HttpStatus.UNAUTHORIZED,
+            "AUTHENTICATION_ERROR",
+            "Authentication failed"
+    ),
+
+    USER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_NOT_FOUND",
+            "User not found"
+    ),
+
+    AUTHERIZATION_ERROR(
+            HttpStatus.FORBIDDEN,
+            "AUTHERIZATION_ERROR",
+            "Autherization error."
     ),
 
     USER_ALREADY_EXISTS(
@@ -18,10 +30,10 @@ public enum ErrorType {
             "this email is already exists."
     ),
 
-    AUTHERIZATION_ERROR(
-            HttpStatus.UNAUTHORIZED,
-            "AUTHERIZATION_ERROR",
-            "Autherization error."
+    VALIDATION_ERROR(
+            HttpStatus.BAD_REQUEST,
+            "VALIDATION_ERROR",
+            "Validation error"
     );
 
     private final HttpStatus httpStatus;
