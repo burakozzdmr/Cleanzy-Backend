@@ -1,6 +1,7 @@
 package com.burakozdemir.cleanzy.cleaner.service;
 
 import com.burakozdemir.cleanzy.cleaner.dto.CleanerResponseDTO;
+import com.burakozdemir.cleanzy.cleaner.repository.CleanerRepository;
 import com.burakozdemir.cleanzy.common.response.ApiSuccessResponse;
 import org.springframework.stereotype.Service;
 
@@ -8,10 +9,10 @@ import java.util.List;
 
 @Service
 public class CleanerServiceImpl implements CleanerService {
-    private final CleanerService cleanerService;
+    private final CleanerRepository cleanerRepository;
 
-    CleanerServiceImpl(CleanerService cleanerService) {
-        this.cleanerService = cleanerService;
+    CleanerServiceImpl(CleanerRepository cleanerRepository) {
+        this.cleanerRepository = cleanerRepository;
     }
 
     @Override
