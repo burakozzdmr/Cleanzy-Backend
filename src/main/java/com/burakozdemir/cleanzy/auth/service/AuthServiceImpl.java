@@ -5,7 +5,7 @@ import com.burakozdemir.cleanzy.auth.dto.LoginRequest;
 import com.burakozdemir.cleanzy.auth.dto.RegisterRequest;
 import com.burakozdemir.cleanzy.auth.entity.Role;
 import com.burakozdemir.cleanzy.auth.entity.User;
-import com.burakozdemir.cleanzy.auth.repository.UserRepository;
+import com.burakozdemir.cleanzy.auth.repository.AuthRepository;
 import com.burakozdemir.cleanzy.common.exception.BusinessException;
 import com.burakozdemir.cleanzy.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (authRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException(ErrorType.USER_ALREADY_EXISTS);
         }
 
@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.CUSTOMER)
                 .build();
 
-        userRepository.save(user);
+        authRepository.save(user);
 
         String token = jwtService.generateToken(user);
 
@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = authRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorType.AUTHERIZATION_ERROR));
 
         String token = jwtService.generateToken(user);
