@@ -9,5 +9,4 @@ public class CleanzyApplication {
     public static void main(String[] args) {
         SpringApplication.run(CleanzyApplication.class, args);
     }
-
 }
