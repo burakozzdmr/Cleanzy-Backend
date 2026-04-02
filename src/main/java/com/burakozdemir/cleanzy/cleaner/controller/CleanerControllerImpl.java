@@ -28,7 +28,7 @@ public class CleanerControllerImpl implements CleanerController {
 
     @Override
     @GetMapping("/{cleanerID}")
-    public ResponseEntity<ApiSuccessResponse<CleanerResponseDTO>> getCleanerDetails(@PathVariable Long cleanerID) {
+    public ResponseEntity<ApiSuccessResponse<CleanerResponseDTO>> getCleanerDetailsByID(@PathVariable Long cleanerID) {
         return null;
     }
 }

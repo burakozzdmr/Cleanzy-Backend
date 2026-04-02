@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CleanerService {
     public ApiSuccessResponse<List<CleanerResponseDTO>> fetchCleanerList();
-    public ApiSuccessResponse<CleanerResponseDTO> fetchCleanerDetails(Long cleanerID);
+    public ApiSuccessResponse<CleanerResponseDTO> fetchCleanerDetailsByID(Long cleanerID);
 }

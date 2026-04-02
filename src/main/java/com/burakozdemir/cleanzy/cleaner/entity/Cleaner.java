@@ -25,7 +25,7 @@ public class Cleaner {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "USER_ID", nullable = false, unique = true)
     private User user;
 
     @Column(name = "IDENTIFICATION_NUMBER")
@@ -34,11 +34,14 @@ public class Cleaner {
     @Column(name = "BIOGRAPHY")
     private String biography;
 
-    @Column(name = "CURRENT_LOCATION")
+    @Column(name = "LOCATION")
     private String currentLocation;
 
-    @Column(name = "RATE")
-    private Double rate;
+    @Column(name = "RATING")
+    private Double rating;
+
+    @Column(name = "TOTAL_REVIEWS")
+    private Integer totalReviews;
 
     @Column(name = "IBAN_NUMBER")
     private String ibanNumber;
@@ -47,7 +50,7 @@ public class Cleaner {
     private BigDecimal hourlyRate;
 
     @ElementCollection
-    @CollectionTable(name = "cleaner_service_area", joinColumns = @JoinColumn(name = "cleaner_id"))
+    @CollectionTable(name = "CLEANER_SERVICE_AREA", joinColumns = @JoinColumn(name = "CLEANER_ID"))
     @Column(name = "SERVICE_AREA")
     private Set<String> serviceArea;
 
@@ -55,20 +58,20 @@ public class Cleaner {
     private String profilePhotoURL;
 
     @ElementCollection
-    @CollectionTable(name = "cleaner_schedule", joinColumns = @JoinColumn(name = "cleaner_id"))
-    @MapKeyColumn(name = "day")
+    @CollectionTable(name = "CLEANER_SCHEDULE", joinColumns = @JoinColumn(name = "CLEANER_ID"))
+    @MapKeyColumn(name = "DAY")
     @MapKeyEnumerated(EnumType.STRING)
     @Column(name = "WORKING_HOURS")
     private Map<DayOfWeek, String> schedule;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "cleaner_services", joinColumns = @JoinColumn(name = "cleaner_id"))
+    @CollectionTable(name = "CLEANER_SERVICES", joinColumns = @JoinColumn(name = "CLEANER_ID"))
     @Column(name = "SERVICES")
     private Set<ServiceType> services;
 
     @Column(name = "VERIFICATION_STATUS")
-    private boolean isVerification;
+    private boolean isVerified;
 
     @Column(name = "AVAILABLE_STATUS")
     private boolean isAvailable;

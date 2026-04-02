@@ -20,7 +20,7 @@ public class CleanerServiceImpl implements CleanerService {
     }
 
     @Override
-    public ApiSuccessResponse<CleanerResponseDTO> fetchCleanerDetails(Long cleanerID) {
+    public ApiSuccessResponse<CleanerResponseDTO> fetchCleanerDetailsByID(Long cleanerID) {
         return null;
     }
 }

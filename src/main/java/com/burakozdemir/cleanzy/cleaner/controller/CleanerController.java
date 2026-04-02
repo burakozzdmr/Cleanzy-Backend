@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface CleanerController {
     public ResponseEntity<ApiSuccessResponse<List<CleanerResponseDTO>>> getCleanerList();
-    public ResponseEntity<ApiSuccessResponse<CleanerResponseDTO>> getCleanerDetails(Long cleanerID);
+    public ResponseEntity<ApiSuccessResponse<CleanerResponseDTO>> getCleanerDetailsByID(Long cleanerID);
 }

@@ -1,4 +1,3 @@
 package com.burakozdemir.cleanzy.cleaner.dto;
 
-public class CleanerRequestDTO {
-}
+public class CleanerRequestDTO { }
