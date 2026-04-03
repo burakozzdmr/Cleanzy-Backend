@@ -23,12 +23,14 @@ public class CleanerControllerImpl implements CleanerController {
     @Override
     @GetMapping("/")
     public ResponseEntity<ApiSuccessResponse<List<CleanerResponseDTO>>> getCleanerList() {
-        return null;
+        return ResponseEntity
+                .ok(cleanerService.fetchCleanerList());
     }
 
     @Override
     @GetMapping("/{cleanerID}")
     public ResponseEntity<ApiSuccessResponse<CleanerResponseDTO>> getCleanerDetailsByID(@PathVariable Long cleanerID) {
-        return null;
+        return ResponseEntity
+                .ok(cleanerService.fetchCleanerDetailsByID(cleanerID));
     }
 }
