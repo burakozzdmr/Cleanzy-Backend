@@ -5,9 +5,12 @@ import com.burakozdemir.cleanzy.auth.entity.User;
 import com.burakozdemir.cleanzy.auth.repository.AuthRepository;
 import com.burakozdemir.cleanzy.cleaner.entity.Cleaner;
 import com.burakozdemir.cleanzy.cleaner.repository.CleanerRepository;
+import com.burakozdemir.cleanzy.common.util.JobStatusType;
 import com.burakozdemir.cleanzy.common.util.ServiceType;
 import com.burakozdemir.cleanzy.customer.entity.Customer;
 import com.burakozdemir.cleanzy.customer.repository.CustomerRepository;
+import com.burakozdemir.cleanzy.job.entity.Job;
+import com.burakozdemir.cleanzy.job.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +34,7 @@ public class DataInitializer implements ApplicationRunner {
     private final AuthRepository authRepository;
     private final CustomerRepository customerRepository;
     private final CleanerRepository cleanerRepository;
+    private final JobRepository jobRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final String DEFAULT_PASSWORD = "Test1234!";
@@ -53,6 +58,14 @@ public class DataInitializer implements ApplicationRunner {
             log.info("Cleaner seed complete.");
         } else {
             log.info("Cleaners already exist, skipping cleaner seed.");
+        }
+
+        if (jobRepository.count() == 0) {
+            log.info("Inserting 20 dummy job listings...");
+            seedJobs();
+            log.info("Job seed complete.");
+        } else {
+            log.info("Jobs already exist, skipping job seed.");
         }
     }
 
@@ -198,6 +211,162 @@ public class DataInitializer implements ApplicationRunner {
             cleaner.setVerified(true);
             cleaner.setAvailable(true);
             cleanerRepository.save(cleaner);
+        }
+    }
+
+    // ─── Jobs ─────────────────────────────────────────────────────────────────
+
+    private void seedJobs() {
+        List<Customer> customers = customerRepository.findAll();
+        List<Cleaner>  cleaners  = cleanerRepository.findAll();
+
+        if (customers.isEmpty() || cleaners.isEmpty()) {
+            log.warn("Cannot seed jobs: customers or cleaners list is empty.");
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // [title, description, address, city, price, scheduledAtOffset(days), status, customerIdx, cleanerIdx(-1=none)]
+        List<Object[]> jobData = List.of(
+                // ── OPEN (6 ilan, cleaner atanmamış) ─────────────────────────────────
+                new Object[]{"Ev Temizliği - 3+1 Daire",
+                        "Salon, mutfak ve 3 oda dahil kapsamlı temizlik. Temizlik malzemeleri tarafımdan sağlanacaktır.",
+                        "Moda Caddesi No:45 D:8", "İstanbul", 450.0, 5,
+                        JobStatusType.OPEN, 0, -1},
+
+                new Object[]{"Ofis Temizliği - 200m²",
+                        "Pazartesi sabahı erken saatte yapılmasını istiyorum. Zemin, cam ve tuvalet temizliği dahil.",
+                        "Büyükdere Cad. No:128 Kat:4", "İstanbul", 650.0, 7,
+                        JobStatusType.OPEN, 1, -1},
+
+                new Object[]{"Derin Temizlik - Yeni Taşınan",
+                        "Yeni taşındığım daireye boyadan önce derin temizlik yapılmasını istiyorum. 2+1 daire.",
+                        "Halaskargazi Cad. No:212 D:3", "İstanbul", 750.0, 10,
+                        JobStatusType.OPEN, 2, -1},
+
+                new Object[]{"Cam Temizliği - Villa",
+                        "3 katlı villanın tüm dış cephe camları ve balkon camları temizlenecek.",
+                        "Çamlık Sokak No:7", "İstanbul", 900.0, 14,
+                        JobStatusType.OPEN, 3, -1},
+
+                new Object[]{"Taşınma Sonrası Temizlik",
+                        "Eski kiracı çıktı, yeni kiracıya hazırlık için 3+1 daire temizliği.",
+                        "Bağdat Cad. No:350 D:12", "İstanbul", 600.0, 8,
+                        JobStatusType.OPEN, 4, -1},
+
+                new Object[]{"Haftalık Ev Temizliği",
+                        "Her hafta düzenli temizlik. İlk görüşme için randevu alıyorum, uzun vadeli çalışmak istiyorum.",
+                        "Suadiye Mah. Plaj Sokak No:3 D:5", "İstanbul", 350.0, 3,
+                        JobStatusType.OPEN, 5, -1},
+
+                // ── ASSIGNED (4 ilan, cleaner atanmış, yakın gelecek) ────────────────
+                new Object[]{"2+1 Ev Temizliği - Hafta Sonu",
+                        "Cumartesi günü 10:00'da başlamasını istiyorum. Standart temizlik, ütü yok.",
+                        "Fenerbahçe Mah. Dalyan Sokak No:9 D:2", "İstanbul", 400.0, 2,
+                        JobStatusType.ASSIGNED, 6, 0},
+
+                new Object[]{"Ofis Temizliği - Akşam Mesaisi Sonrası",
+                        "Çalışanlar çıktıktan sonra 19:00-22:00 arası ofis temizliği. 150m².",
+                        "Levent Mah. Nispetiye Cad. No:6 Kat:2", "İstanbul", 550.0, 1,
+                        JobStatusType.ASSIGNED, 7, 1},
+
+                new Object[]{"Derin Temizlik - Banyo ve Mutfak",
+                        "Özellikle banyo fayans aralarının ve mutfak ocak çevresinin derin temizliği.",
+                        "Ortaköy Mah. Muallim Naci Cad. No:88 D:6", "İstanbul", 500.0, 4,
+                        JobStatusType.ASSIGNED, 8, 2},
+
+                new Object[]{"Taşınma Temizliği - Boş Daire",
+                        "Tamamen boş daire, boyadan önce toz ve kaba temizlik yapılacak. 4+1.",
+                        "Koşuyolu Mah. Koşuyolu Cad. No:14 D:1", "İstanbul", 800.0, 3,
+                        JobStatusType.ASSIGNED, 9, 3},
+
+                // ── IN_PROGRESS (4 ilan, aktif devam ediyor) ────────────────────────
+                new Object[]{"Ev Temizliği - 1+1 Stüdyo",
+                        "Stüdyo daire hızlı temizlik. Bugün içinde tamamlanması gerekiyor.",
+                        "Cihangir Mah. Akarsu Cad. No:22 D:4", "İstanbul", 300.0, 0,
+                        JobStatusType.IN_PROGRESS, 10, 4},
+
+                new Object[]{"Büyük Ofis Kompleksi Temizliği",
+                        "500m² ofis alanı, 3 toplantı odası, 2 mutfak ve 4 tuvalet dahil.",
+                        "Maslak Mah. AOS 55. Sokak No:2 Kat:8", "İstanbul", 1200.0, 0,
+                        JobStatusType.IN_PROGRESS, 11, 5},
+
+                new Object[]{"Derin Temizlik - Sezon Sonu",
+                        "Kış sezonu kapanışı öncesi tüm evin derin temizliği. Kolileri de kaldıracağız.",
+                        "Etiler Mah. Nispetiye Cad. No:5 D:10", "İstanbul", 700.0, 1,
+                        JobStatusType.IN_PROGRESS, 12, 6},
+
+                new Object[]{"Cam ve Çerçeve Temizliği",
+                        "İş merkezi dış cephe camları. Emniyet halatı gerektiren yüksek kat.",
+                        "Gayrettepe Mah. Yıldız Posta Cad. No:48 Kat:12", "İstanbul", 950.0, 0,
+                        JobStatusType.IN_PROGRESS, 13, 7},
+
+                // ── COMPLETED (4 ilan, tamamlanmış) ─────────────────────────────────
+                new Object[]{"Ev Temizliği - Kiracı Çıkışı",
+                        "Kiracı çıkışı sonrası depozito iadesi için temizlik yapıldı.",
+                        "Kadıköy Mah. Moda Cad. No:67 D:3", "İstanbul", 450.0, -5,
+                        JobStatusType.COMPLETED, 14, 8},
+
+                new Object[]{"Bayram Öncesi Genel Temizlik",
+                        "Bayram öncesi 3+1 daire komple temizliği, perdeler dahil.",
+                        "Üsküdar Mah. Hakimiyet-i Milliye Cad. No:12 D:5", "İstanbul", 520.0, -3,
+                        JobStatusType.COMPLETED, 15, 9},
+
+                new Object[]{"Ofis Taşınma Temizliği",
+                        "Taşınan ofisin ardında bırakılan tüm alanın temizlenmesi tamamlandı.",
+                        "Şişli Mah. Cumhuriyet Cad. No:5 Kat:3", "İstanbul", 680.0, -7,
+                        JobStatusType.COMPLETED, 16, 10},
+
+                new Object[]{"Mutfak Derin Temizliği",
+                        "Fırın, buzdolabı arkası, dolap içleri ve tüm beyaz eşya temizliği yapıldı.",
+                        "Beşiktaş Mah. Barbaros Bulvarı No:74 D:8", "İstanbul", 380.0, -2,
+                        JobStatusType.COMPLETED, 17, 11},
+
+                // ── CANCELLED (2 ilan) ───────────────────────────────────────────────
+                new Object[]{"Ev Temizliği - İptal",
+                        "Randevu günü müşteri ulaşılamaz olduğu için iptal edildi.",
+                        "Bostancı Mah. E-5 Yanyol No:33 D:2", "İstanbul", 400.0, -1,
+                        JobStatusType.CANCELLED, 18, -1},
+
+                new Object[]{"Derin Temizlik - İptal",
+                        "Müşteri tadilat programı değiştiği için iptal talep etti.",
+                        "Sarıyer Mah. Büyükdere Cad. No:204 D:6", "İstanbul", 700.0, -4,
+                        JobStatusType.CANCELLED, 19, -1}
+        );
+
+        for (Object[] data : jobData) {
+            String         title          = (String)         data[0];
+            String         description    = (String)         data[1];
+            String         address        = (String)         data[2];
+            String         city           = (String)         data[3];
+            Double         price          = (Double)         data[4];
+            int            dayOffset      = (int)            data[5];
+            JobStatusType  status         = (JobStatusType)  data[6];
+            int            customerIdx    = (int)            data[7];
+            int            cleanerIdx     = (int)            data[8];
+
+            Customer customer = customers.get(customerIdx % customers.size());
+            Cleaner  cleaner  = cleanerIdx >= 0 ? cleaners.get(cleanerIdx % cleaners.size()) : null;
+
+            LocalDateTime scheduledAt = now.plusDays(dayOffset).withHour(10).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime createdAt   = scheduledAt.minusDays(2);
+            LocalDateTime updatedAt   = status == JobStatusType.OPEN ? createdAt : createdAt.plusDays(1);
+
+            Job job = new Job();
+            job.setCustomer(customer);
+            job.setTitle(title);
+            job.setDescription(description);
+            job.setAddress(address);
+            job.setCity(city);
+            job.setPrice(price);
+            job.setScheduledAt(scheduledAt);
+            job.setStatus(status);
+            job.setAssignedCleaner(cleaner);
+            job.setCreatedAt(createdAt);
+            job.setUpdatedAt(updatedAt);
+
+            jobRepository.save(job);
         }
     }
 }

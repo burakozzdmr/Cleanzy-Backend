@@ -42,6 +42,12 @@ public enum ErrorType {
             "Cleaner not found"
     ),
 
+    JOB_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "JOB_NOT_FOUND",
+            "Job not found"
+    ),
+
     VALIDATION_ERROR(
             HttpStatus.BAD_REQUEST,
             "VALIDATION_ERROR",

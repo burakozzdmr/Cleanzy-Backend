@@ -7,12 +7,9 @@ import com.burakozdemir.cleanzy.cleaner.repository.CleanerRepository;
 import com.burakozdemir.cleanzy.common.exception.BusinessException;
 import com.burakozdemir.cleanzy.common.exception.ErrorType;
 import com.burakozdemir.cleanzy.common.response.ApiSuccessResponse;
-import com.burakozdemir.cleanzy.customer.dto.CustomerResponseDTO;
-import com.burakozdemir.cleanzy.customer.entity.Customer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
