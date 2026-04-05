@@ -30,6 +30,24 @@ public enum ErrorType {
             "this email is already exists."
     ),
 
+    CUSTOMER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "CUSTOMER_NOT_FOUND",
+            "Customer not found"
+    ),
+
+    CLEANER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "CLEANER_NOT_FOUND",
+            "Cleaner not found"
+    ),
+
+    JOB_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "JOB_NOT_FOUND",
+            "Job not found"
+    ),
+
     VALIDATION_ERROR(
             HttpStatus.BAD_REQUEST,
             "VALIDATION_ERROR",
