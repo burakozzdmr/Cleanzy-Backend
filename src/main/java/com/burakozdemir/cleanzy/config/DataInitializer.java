@@ -9,6 +9,8 @@ import com.burakozdemir.cleanzy.common.util.JobStatusType;
 import com.burakozdemir.cleanzy.common.util.ServiceType;
 import com.burakozdemir.cleanzy.customer.entity.Customer;
 import com.burakozdemir.cleanzy.customer.repository.CustomerRepository;
+import com.burakozdemir.cleanzy.favorite.entity.Favorite;
+import com.burakozdemir.cleanzy.favorite.repository.FavoriteRepository;
 import com.burakozdemir.cleanzy.job.entity.Job;
 import com.burakozdemir.cleanzy.job.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class DataInitializer implements ApplicationRunner {
     private final CustomerRepository customerRepository;
     private final CleanerRepository cleanerRepository;
     private final JobRepository jobRepository;
+    private final FavoriteRepository favoriteRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final String DEFAULT_PASSWORD = "Test1234!";
@@ -66,6 +69,14 @@ public class DataInitializer implements ApplicationRunner {
             log.info("Job seed complete.");
         } else {
             log.info("Jobs already exist, skipping job seed.");
+        }
+
+        if (favoriteRepository.count() == 0) {
+            log.info("Inserting dummy favorites...");
+            seedFavorites();
+            log.info("Favorites seed complete.");
+        } else {
+            log.info("Favorites already exist, skipping favorite seed.");
         }
     }
 
@@ -368,5 +379,70 @@ public class DataInitializer implements ApplicationRunner {
 
             jobRepository.save(job);
         }
+    }
+
+    // ─── Favorites ────────────────────────────────────────────────────────────
+
+    private void seedFavorites() {
+        List<User> allUsers = authRepository.findAll();
+
+        List<User> customers = allUsers.stream()
+                .filter(u -> u.getRole() == Role.CUSTOMER)
+                .toList();
+
+        List<User> cleaners = allUsers.stream()
+                .filter(u -> u.getRole() == Role.CLEANER)
+                .toList();
+
+        if (customers.size() < 10 || cleaners.size() < 10) {
+            log.warn("Not enough users to seed favorites.");
+            return;
+        }
+
+        // Müşteriler temizlikçileri favoriliyor
+        // Her müşteri 2-3 temizlikçiyi favorisine ekliyor
+        int[][] customerToCleanerPairs = {
+                {0, 0}, {0, 2}, {0, 6},
+                {1, 1}, {1, 3},
+                {2, 2}, {2, 4}, {2, 8},
+                {3, 5}, {3, 9},
+                {4, 0}, {4, 7},
+                {5, 3}, {5, 6}, {5, 11},
+                {6, 1}, {6, 10},
+                {7, 4}, {7, 8}, {7, 12},
+                {8, 7}, {8, 9},
+                {9, 0}, {9, 5}, {9, 14},
+        };
+
+        // Temizlikçiler müşterileri favoriliyor
+        int[][] cleanerToCustomerPairs = {
+                {0, 0}, {0, 4}, {0, 9},
+                {1, 1}, {1, 6},
+                {2, 2}, {2, 5},
+                {3, 3}, {3, 8},
+                {4, 7}, {4, 2},
+                {5, 9}, {5, 3},
+                {6, 5}, {6, 0},
+                {7, 4}, {7, 8},
+                {8, 1}, {8, 7},
+                {9, 6}, {9, 9},
+        };
+
+        for (int[] pair : customerToCleanerPairs) {
+            saveFavorite(customers.get(pair[0]), cleaners.get(pair[1]));
+        }
+
+        for (int[] pair : cleanerToCustomerPairs) {
+            saveFavorite(cleaners.get(pair[0]), customers.get(pair[1]));
+        }
+    }
+
+    private void saveFavorite(User user, User favoritedUser) {
+        if (favoriteRepository.existsByUserAndFavoritedUser(user, favoritedUser)) return;
+
+        Favorite favorite = new Favorite();
+        favorite.setUser(user);
+        favorite.setFavoritedUser(favoritedUser);
+        favoriteRepository.save(favorite);
     }
 }

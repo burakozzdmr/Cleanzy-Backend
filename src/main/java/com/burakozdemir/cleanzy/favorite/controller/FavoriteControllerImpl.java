@@ -4,7 +4,7 @@ import com.burakozdemir.cleanzy.common.response.ApiSuccessResponse;
 import com.burakozdemir.cleanzy.favorite.dto.FavoriteRequestDTO;
 import com.burakozdemir.cleanzy.favorite.dto.FavoriteResponseDTO;
 import com.burakozdemir.cleanzy.favorite.service.FavoriteService;
-import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,30 +13,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/api/v1/favorites")
 public class FavoriteControllerImpl implements FavoriteController {
+
     private final FavoriteService favoriteService;
 
     FavoriteControllerImpl(FavoriteService favoriteService) {
         this.favoriteService = favoriteService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<ApiSuccessResponse<List<FavoriteResponseDTO>>> getFavoriteList() {
-        return null;
+    @GetMapping("/{userId}")
+    @Override
+    public ResponseEntity<ApiSuccessResponse<List<FavoriteResponseDTO>>> getFavoritesByUserId(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity
+                .ok(favoriteService.fetchFavoritesByUserId(userId));
     }
 
-    @GetMapping("/{favoriteId}")
-    public ResponseEntity<ApiSuccessResponse<FavoriteResponseDTO>> getFavoriteById(@PathVariable Long favoriteId) {
-        return null;
-    }
-
-    @PostMapping("/")
+    @PostMapping
+    @Override
     public ResponseEntity<ApiSuccessResponse<FavoriteResponseDTO>> addFavorite(
-            @RequestBody FavoriteRequestDTO favoriteRequestDTO) {
-        return null;
+            @RequestBody FavoriteRequestDTO request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(favoriteService.addFavorite(request));
     }
 
-    @DeleteMapping("/{favoriteId}")
-    public ResponseEntity<ApiSuccessResponse<Boolean>> deleteFavoriteById(@PathVariable Long favoriteId) {
-        return null;
+    @DeleteMapping
+    @Override
+    public ResponseEntity<ApiSuccessResponse<Boolean>> removeFavorite(
+            @RequestBody FavoriteRequestDTO request
+    ) {
+        return ResponseEntity
+                .ok(favoriteService.removeFavorite(request));
     }
 }
