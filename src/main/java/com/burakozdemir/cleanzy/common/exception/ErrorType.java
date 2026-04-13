@@ -48,6 +48,18 @@ public enum ErrorType {
             "Job not found"
     ),
 
+    FAVORITE_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "FAVORITE_NOT_FOUND",
+            "Favorite not found"
+    ),
+
+    ALREADY_FAVORITED(
+            HttpStatus.CONFLICT,
+            "ALREADY_FAVORITED",
+            "This user is already in your favorites"
+    ),
+
     VALIDATION_ERROR(
             HttpStatus.BAD_REQUEST,
             "VALIDATION_ERROR",
