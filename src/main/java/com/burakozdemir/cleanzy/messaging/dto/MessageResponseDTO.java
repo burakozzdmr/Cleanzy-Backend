@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MessageResponseDTO {
     private Long id;
+    private Long conversationId;
     private Long senderId;
     private String senderName;
     private String senderPhotoURL;

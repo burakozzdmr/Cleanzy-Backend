@@ -21,7 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -54,22 +57,27 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public ApiSuccessResponse<JobResponseDTO> addJob(JobRequestDTO request) {
-        Customer customer = customerRepository.findById(request.getCustomerId())
+        // customerId field carries the User.id (from JWT auth response),
+        // not the Customer table PK — resolve via user FK.
+        Customer customer = customerRepository.findByUser_Id(request.getCustomerId())
                 .orElseThrow(() -> new BusinessException(ErrorType.CUSTOMER_NOT_FOUND));
 
         Cleaner cleaner = cleanerRepository.findById(request.getCleanerId())
                 .orElseThrow(() -> new BusinessException(ErrorType.CLEANER_NOT_FOUND));
 
+        LocalDateTime scheduledAt = resolveScheduledAt(request);
+        String timeSlot = resolveTimeSlot(request);
+
         Job job = new Job();
         job.setCustomer(customer);
         job.setAssignedCleaner(cleaner);
         job.setAddress(request.getAddress());
-        job.setCity(request.getCity());
-        job.setScheduledAt(request.getScheduledAt());
-        job.setTimeSlot(request.getTimeSlot());
+        job.setCity(request.getCity() != null ? request.getCity() : "");
+        job.setScheduledAt(scheduledAt);
+        job.setTimeSlot(timeSlot);
         job.setHouseSize(request.getHouseSize());
         job.setExtraServices(request.getExtraServices());
-        job.setPrice(request.getTotalPrice());
+        job.setPrice(request.getTotalPrice() != null ? request.getTotalPrice() : 0.0);
         job.setNotes(request.getNotes());
         job.setStatus(JobStatusType.OPEN);
         job.setCreatedAt(LocalDateTime.now());
@@ -128,6 +136,37 @@ public class JobServiceImpl implements JobService {
 
         List<JobResponseDTO> dtos = jobs.stream().map(this::toJobResponseDTO).toList();
         return ApiSuccessResponse.of(dtos, dtos.size());
+    }
+
+    // ── Scheduling helpers ────────────────────────────────────────────────────
+
+    /**
+     * Accepts either a pre-built {@code scheduledAt} (LocalDateTime) or the iOS pair
+     * {@code scheduledDate} ("yyyy-MM-dd") + {@code scheduledTime} ("HH:mm").
+     */
+    private LocalDateTime resolveScheduledAt(com.burakozdemir.cleanzy.job.dto.JobRequestDTO req) {
+        if (req.getScheduledAt() != null) {
+            return req.getScheduledAt();
+        }
+        if (req.getScheduledDate() != null && req.getScheduledTime() != null) {
+            try {
+                LocalDate date = LocalDate.parse(req.getScheduledDate());
+                LocalTime time = LocalTime.parse(req.getScheduledTime());
+                return LocalDateTime.of(date, time);
+            } catch (DateTimeParseException ignored) { }
+        }
+        return LocalDateTime.now();
+    }
+
+    /**
+     * Uses the explicit {@code timeSlot} field when present; falls back to
+     * {@code scheduledTime} (the iOS-style "HH:mm" string).
+     */
+    private String resolveTimeSlot(com.burakozdemir.cleanzy.job.dto.JobRequestDTO req) {
+        if (req.getTimeSlot() != null && !req.getTimeSlot().isBlank()) {
+            return req.getTimeSlot();
+        }
+        return req.getScheduledTime() != null ? req.getScheduledTime() : "";
     }
 
     // ── Mapping ───────────────────────────────────────────────────────────────

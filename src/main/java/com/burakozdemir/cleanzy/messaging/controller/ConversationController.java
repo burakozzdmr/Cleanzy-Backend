@@ -4,6 +4,7 @@ import com.burakozdemir.cleanzy.common.response.ApiSuccessResponse;
 import com.burakozdemir.cleanzy.messaging.dto.ConversationRequestDTO;
 import com.burakozdemir.cleanzy.messaging.dto.ConversationResponseDTO;
 import com.burakozdemir.cleanzy.messaging.dto.MessageResponseDTO;
+import com.burakozdemir.cleanzy.messaging.dto.MessageSendRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -26,4 +27,9 @@ public interface ConversationController {
     );
 
     ResponseEntity<ApiSuccessResponse<Void>> deleteConversation(Long conversationId, Long userId);
+
+    ResponseEntity<ApiSuccessResponse<MessageResponseDTO>> sendMessage(
+            Long conversationId,
+            MessageSendRequest request
+    );
 }

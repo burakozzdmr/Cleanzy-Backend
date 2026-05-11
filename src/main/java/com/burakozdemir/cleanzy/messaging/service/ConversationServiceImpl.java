@@ -11,6 +11,7 @@ import com.burakozdemir.cleanzy.customer.entity.Customer;
 import com.burakozdemir.cleanzy.customer.repository.CustomerRepository;
 import com.burakozdemir.cleanzy.messaging.dto.ConversationResponseDTO;
 import com.burakozdemir.cleanzy.messaging.dto.MessageResponseDTO;
+import com.burakozdemir.cleanzy.messaging.dto.MessageSendRequest;
 import com.burakozdemir.cleanzy.messaging.entity.Conversation;
 import com.burakozdemir.cleanzy.messaging.entity.Message;
 import com.burakozdemir.cleanzy.messaging.entity.UserPresence;
@@ -99,6 +100,42 @@ public class ConversationServiceImpl implements ConversationService {
                 .map(msg -> toMessageResponseDTO(msg, currentUserId));
 
         return ApiSuccessResponse.of(messages);
+    }
+
+    @Override
+    @Transactional
+    public ApiSuccessResponse<MessageResponseDTO> sendMessage(Long conversationId, MessageSendRequest request) {
+        User sender = authRepository.findById(request.getSenderId())
+                .orElseThrow(() -> new BusinessException(ErrorType.USER_NOT_FOUND));
+
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new BusinessException(ErrorType.CONVERSATION_NOT_FOUND));
+
+        Message message = new Message();
+        message.setConversation(conversation);
+        message.setSender(sender);
+        message.setContent(request.getContent());
+        message.setRead(false);
+
+        Message saved = messageRepository.save(message);
+
+        conversation.setLastMessage(request.getContent());
+        conversation.setLastMessageAt(saved.getSentAt());
+        conversationRepository.save(conversation);
+
+        MessageResponseDTO dto = MessageResponseDTO.builder()
+                .id(saved.getId())
+                .conversationId(conversationId)
+                .senderId(sender.getId())
+                .senderName(sender.getFullName())
+                .senderPhotoURL(resolvePhotoURL(sender))
+                .content(saved.getContent())
+                .sentAt(saved.getSentAt())
+                .isRead(false)
+                .isMine(true)
+                .build();
+
+        return ApiSuccessResponse.of(dto);
     }
 
     @Override

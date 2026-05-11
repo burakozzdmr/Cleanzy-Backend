@@ -1,6 +1,5 @@
 package com.burakozdemir.cleanzy.profile.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +14,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Schema(description = "User profile. Role-specific fields are omitted (null) when they do not apply to the returned role.")
+@Schema(description = "User profile. Fields that do not apply to the user's role are returned as null.")
 public class ProfileDTO {
 
     // ── Base fields (always present for both roles) ───────────────────────────

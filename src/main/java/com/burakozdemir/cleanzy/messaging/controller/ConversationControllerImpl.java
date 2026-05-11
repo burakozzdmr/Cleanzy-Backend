@@ -4,6 +4,7 @@ import com.burakozdemir.cleanzy.common.response.ApiSuccessResponse;
 import com.burakozdemir.cleanzy.messaging.dto.ConversationRequestDTO;
 import com.burakozdemir.cleanzy.messaging.dto.ConversationResponseDTO;
 import com.burakozdemir.cleanzy.messaging.dto.MessageResponseDTO;
+import com.burakozdemir.cleanzy.messaging.dto.MessageSendRequest;
 import com.burakozdemir.cleanzy.messaging.service.ConversationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -57,6 +58,18 @@ public class ConversationControllerImpl implements ConversationController {
             @RequestParam(defaultValue = "30") int size
     ) {
         return ResponseEntity.ok(conversationService.getMessages(conversationId, currentUserId, page, size));
+    }
+
+    @Override
+    @PostMapping("/{conversationId}/messages")
+    @Operation(summary = "Send a message in a conversation (REST fallback — prefer WebSocket for real-time delivery)")
+    public ResponseEntity<ApiSuccessResponse<MessageResponseDTO>> sendMessage(
+            @PathVariable Long conversationId,
+            @Valid @RequestBody MessageSendRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(conversationService.sendMessage(conversationId, request));
     }
 
     @Override
