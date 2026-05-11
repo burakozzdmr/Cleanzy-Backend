@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerResponseDTO implements ProfileDTO {
+public class CustomerResponseDTO extends ProfileDTO {
     private Long id;
     private UserSummaryDTO user;
     private String currentLocation;

@@ -48,6 +48,7 @@ public class CustomerServiceImpl implements CustomerService {
         if (customer.getUser() != null) {
             UserSummaryDTO userSummary = new UserSummaryDTO();
             BeanUtils.copyProperties(customer.getUser(), userSummary);
+            userSummary.setUserId(customer.getUser().getId());
             dto.setUser(userSummary);
         }
 
