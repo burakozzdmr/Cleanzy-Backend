@@ -37,14 +37,16 @@ public class Job {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
+    // Not sent by the iOS client; stored as empty string when absent.
     private String city;
 
     @Column(name = "TIME_SLOT")
     private String timeSlot;
 
+    // columnDefinition prevents Hibernate 6 from generating a CHECK constraint
+    // with the old enum value names (ONE_PLUS_ONE etc.) that would reject new inserts.
     @Enumerated(EnumType.STRING)
-    @Column(name = "HOUSE_SIZE")
+    @Column(name = "HOUSE_SIZE", columnDefinition = "varchar(50)")
     private HouseSizeType houseSize;
 
     @ElementCollection
@@ -61,6 +63,7 @@ public class Job {
     private LocalDateTime scheduledAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(30)")
     private JobStatusType status;
 
     private LocalDateTime createdAt;

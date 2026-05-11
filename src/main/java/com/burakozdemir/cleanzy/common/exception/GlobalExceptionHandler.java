@@ -1,6 +1,7 @@
 package com.burakozdemir.cleanzy.common.exception;
 
 import com.burakozdemir.cleanzy.common.response.ApiErrorResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -55,6 +56,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ErrorType.VALIDATION_ERROR.getHttpStatus())
                 .body(ApiErrorResponse.of(ErrorType.VALIDATION_ERROR));
+    }
+
+    /**
+     * Handles DB constraint violations (NOT NULL, CHECK, UNIQUE).
+     * These surface when the request reaches the DB but violates a schema rule.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(ErrorType.INTERNAL_SERVER_ERROR.getHttpStatus())
+                .body(ApiErrorResponse.of(ErrorType.INTERNAL_SERVER_ERROR));
     }
 
     /**
