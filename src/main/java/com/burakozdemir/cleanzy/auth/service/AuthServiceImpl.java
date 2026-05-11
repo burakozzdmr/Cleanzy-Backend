@@ -90,6 +90,17 @@ public class AuthServiceImpl implements AuthService {
         User user = authRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorType.AUTHORIZATION_ERROR));
 
+        if (request.getRole() != null) {
+            try {
+                Role requestedRole = Role.valueOf(request.getRole().toUpperCase());
+                if (!user.getRole().equals(requestedRole)) {
+                    throw new BusinessException(ErrorType.ROLE_MISMATCH);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException(ErrorType.INVALID_ROLE);
+            }
+        }
+
         String token = jwtService.generateToken(user);
 
         return buildAuthResponse(token, user);
