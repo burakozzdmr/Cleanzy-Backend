@@ -2,7 +2,6 @@ package com.burakozdemir.cleanzy.cleaner.dto;
 
 import com.burakozdemir.cleanzy.auth.dto.UserSummaryDTO;
 import com.burakozdemir.cleanzy.common.util.ServiceType;
-import com.burakozdemir.cleanzy.profile.dto.ProfileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CleanerResponseDTO implements ProfileDTO {
+public class CleanerResponseDTO {
     private Long id;
     private UserSummaryDTO user;
     private String biography;
