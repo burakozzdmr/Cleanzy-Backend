@@ -18,9 +18,9 @@ public enum ErrorType {
             "User not found"
     ),
 
-    AUTHERIZATION_ERROR(
+    AUTHORIZATION_ERROR(
             HttpStatus.FORBIDDEN,
-            "AUTHERIZATION_ERROR",
+            "AUTHORIZATION_ERROR",
             "Autherization error."
     ),
 
@@ -64,6 +64,60 @@ public enum ErrorType {
             HttpStatus.BAD_REQUEST,
             "VALIDATION_ERROR",
             "Validation error"
+    ),
+
+    INVALID_ROLE(
+            HttpStatus.BAD_REQUEST,
+            "INVALID_ROLE",
+            "Invalid role specified"
+    ),
+
+    UNAUTHORIZED_ACCESS(
+            HttpStatus.FORBIDDEN,
+            "UNAUTHORIZED_ACCESS",
+            "You are not authorized to perform this action"
+    ),
+
+    TOKEN_BLACKLISTED(
+            HttpStatus.UNAUTHORIZED,
+            "TOKEN_BLACKLISTED",
+            "Token has been invalidated"
+    ),
+
+    INVALID_PASSWORD(
+            HttpStatus.BAD_REQUEST,
+            "INVALID_PASSWORD",
+            "Current password is incorrect"
+    ),
+
+    JOB_CANNOT_BE_DELETED(
+            HttpStatus.CONFLICT,
+            "JOB_CANNOT_BE_DELETED",
+            "Only jobs with status OPEN or CANCELLED can be deleted"
+    ),
+
+    REVIEW_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "REVIEW_NOT_FOUND",
+            "Review not found"
+    ),
+
+    REVIEW_ALREADY_EXISTS(
+            HttpStatus.CONFLICT,
+            "REVIEW_ALREADY_EXISTS",
+            "You have already reviewed this job"
+    ),
+
+    JOB_NOT_COMPLETED(
+            HttpStatus.BAD_REQUEST,
+            "JOB_NOT_COMPLETED",
+            "Reviews can only be created for completed jobs"
+    ),
+
+    CONVERSATION_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "CONVERSATION_NOT_FOUND",
+            "Conversation not found"
     );
 
     private final HttpStatus httpStatus;
