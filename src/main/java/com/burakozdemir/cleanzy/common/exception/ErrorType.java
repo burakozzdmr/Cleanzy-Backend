@@ -118,6 +118,24 @@ public enum ErrorType {
             HttpStatus.NOT_FOUND,
             "CONVERSATION_NOT_FOUND",
             "Conversation not found"
+    ),
+
+    ROLE_MISMATCH(
+            HttpStatus.FORBIDDEN,
+            "ROLE_MISMATCH",
+            "Bu hesap belirtilen rol için kayıtlı değil."
+    ),
+
+    INVALID_REQUEST_BODY(
+            HttpStatus.BAD_REQUEST,
+            "INVALID_REQUEST_BODY",
+            "Request body could not be parsed. Check field names, types and enum values."
+    ),
+
+    INTERNAL_SERVER_ERROR(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "INTERNAL_SERVER_ERROR",
+            "An unexpected error occurred. Please try again later."
     );
 
     private final HttpStatus httpStatus;
